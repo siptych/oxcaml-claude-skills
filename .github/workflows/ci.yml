@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  scripts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck scripts/*.sh
+      - run: scripts/test-check-obj-magic.sh
+      - run: scripts/check-obj-magic.sh .
+
+  examples:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      # The first run builds the OxCaml compiler (30 minutes or more); setup-ocaml
+      # caches the switch afterwards.
+      - uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: ocaml-variants.5.2.0+ox
+          opam-repositories: |
+            ox: git+https://github.com/oxcaml/opam-repository.git#afddc8337950dbc02863fe30ae58735a1cf2719f
+            default: https://github.com/ocaml/opam-repository.git
+      - name: oxcaml-modes examples
+        working-directory: skills/oxcaml-modes/examples
+        run: |
+          opam install . --deps-only --with-test
+          opam exec -- dune build @all
+          opam exec -- dune test
+      - name: oxcaml-performance examples
+        working-directory: skills/oxcaml-performance/examples
+        run: |
+          opam install . --deps-only --with-test
+          opam exec -- dune build @all
+          opam exec -- dune test

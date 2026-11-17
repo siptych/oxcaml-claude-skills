@@ -1,0 +1,19 @@
+(lang dune 3.17)
+(name oxcaml-performance-examples)
+(generate_opam_files true)
+(license MIT)
+(maintainers "siptych")
+(authors "siptych")
+(source (github siptych/oxcaml-claude-skills))
+(package
+ (name oxcaml-performance-examples)
+ (synopsis "Compiling OxCaml performance examples for the oxcaml-performance skill")
+ (allow_empty)
+ (depends
+  (ocaml (>= 5.2))
+  dune
+  core
+  core_kernel
+  ppx_jane
+  unboxed
+  ocaml_intrinsics))
