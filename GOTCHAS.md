@@ -368,16 +368,10 @@ many coding agents in one dune workspace at once. Stable entries are promoted in
 - Concatenated zstd frames decode as one stream with `zstd -d`, so appending a frame to an existing `.zst` is a valid restart strategy; the OCaml binding's `get_decompressed_size` reads only the first frame.
 - Bigbuffer plus a reused bin_prot scratch buffer makes appends allocation-free. pyarrow skips `_`-prefixed names, so side files next to Parquet go in `_manifest/`. DuckDB `ASOF LEFT JOIN` and `epoch_ns` work on `TIMESTAMP_NS`.
 
-## git and shell
+## Shell
 
-- `git add -A` in one repo while a subagent works in the same checkout sweeps
-  its half-finished files into your commit. Serialize work per repo, or `git
-  add` specific paths.
 - Never chain `dune test; git commit; git push` with `;` — a killed test
   still commits. Use `&&`.
-- **git.** `git rm` stages deletions; a later `git add a b && git commit` sweeps them into
-  that commit. When splitting a refactor into small commits, commit by path
-  (`git commit -m ... -- paths`) or keep deletions unstaged (`rm`, not `git rm`).
 - `dune exec` runs the binary from `_build-*/install/default/bin/<name>`, so `pkill -f main.exe` misses it; kill by pid or by the `<name> -port` pattern. Check `lsof -iTCP:<port> -sTCP:LISTEN` before starting a server on a fixed port.
 - `cmd | grep -v ... && git commit` skips the commit when grep filters every line; never put a filtering grep in an `&&` chain. A `;` chain once pushed a non-compiling commit. In zsh `echo ======` fails with "not found".
 - zsh does not word-split variables: `opam install $PKGS` passes one argument; use `${=PKGS}` or `bash -c`. Serialize opam installs across agents.
